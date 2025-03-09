@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InterviewBuddy - Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #858796;
+            --success-color: #1cc88a;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--primary-color) 0%, #224abe 100%);
+            color: white;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 1rem;
+            margin: 0.2rem 0;
+            border-radius: 5px;
+        }
+
+        .sidebar .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+
+        .quick-action-card:hover {
+            transform: translateY(-3px);
+            transition: transform 0.3s ease;
+        }
+
+        .progress {
+            height: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .stats-card {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .upcoming-interview {
+            border-left: 4px solid var(--success-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar p-3">
+                <h4 class="text-center mb-4">InterviewBuddy</h4>
+                <nav class="nav flex-column">
+                    <a class="nav-link active" href="{% url 'dashboard' %}"><i class="fas fa-home me-2"></i>Dashboard</a>
+                    <a class="nav-link" href="#"><i class="fas fa-user-tie me-2"></i>Mock Interviews</a>
+                    <a class="nav-link" href="#"><i class="fas fa-users me-2"></i>Group Discussions</a>
+                    <a class="nav-link" href="#"><i class="fas fa-code me-2"></i>Technical Tests</a>
+                    <a class="nav-link" href="#"><i class="fas fa-book me-2"></i>Resources</a>
+                    <a class="nav-link" href="#"><i class="fas fa-chart-line me-2"></i>Progress</a>
+                    <a class="nav-link" href="{% url 'logout' %}"><i class="fa fa-sign-out-alt"></i> <!-- Logout icon -->
+                        logout</a>
+                    
+                    
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 p-4">
+                <!-- Welcome Section -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Welcome back, {{request.user}}</h2>
+                    <button class="btn btn-primary" onclick="startNewInterview()">
+                        <i class="fas fa-plus me-2"></i>New Interview
+                    </button>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card stats-card p-3">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="text-primary">Completed Interviews</h6>
+                                    <h3>12</h3>
+                                </div>
+                                <i class="fas fa-user-tie fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stats-card p-3">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="text-success">Average Score</h6>
+                                    <h3>85%</h3>
+                                </div>
+                                <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stats-card p-3">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="text-info">Practice Hours</h6>
+                                    <h3>24</h3>
+                                </div>
+                                <i class="fas fa-clock fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card stats-card p-3">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="text-warning">Skills Mastered</h6>
+                                    <h3>8</h3>
+                                </div>
+                                <i class="fas fa-star fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4 class="mb-3">Quick Actions</h4>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card quick-action-card p-4 text-center cursor-pointer" onclick="startMockInterview()">
+                            <i class="fas fa-video fa-3x mb-3 text-primary"></i>
+                            <h5>Start Mock Interview</h5>
+                            <p class="text-muted">Practice with AI interviewer</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card quick-action-card p-4 text-center">
+                            <i class="fas fa-users fa-3x mb-3 text-success"></i>
+                            <h5>Join Group Discussion</h5>
+                            <p class="text-muted">Practice with peers</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card quick-action-card p-4 text-center">
+                            <i class="fas fa-laptop-code fa-3x mb-3 text-info"></i>
+                            <h5>Technical Assessment</h5>
+                            <p class="text-muted">Test your skills</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Interviews -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h4 class="mb-3">Upcoming Interviews</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card upcoming-interview p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5>Technical Interview Practice</h5>
+                                    <p class="text-muted mb-0">Today, 2:00 PM</p>
+                                </div>
+                                <button class="btn btn-success">Join Now</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card upcoming-interview p-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5>HR Interview Simulation</h5>
+                                    <p class="text-muted mb-0">Tomorrow, 10:00 AM</p>
+                                </div>
+                                <button class="btn btn-outline-success">Prepare</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Section -->
+                <div class="row">
+                    <div class="col-12">
+                        <h4 class="mb-3">Your Progress</h4>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card p-3">
+                            <h6>Technical Skills</h6>
+                            <div class="progress mb-2">
+                                <div class="progress-bar" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">75%</div>
+                            </div>
+                            <h6>Communication Skills</h6>
+                            <div class="progress mb-2">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 85%" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100">85%</div>
+                            </div>
+                            <h6>Problem Solving</h6>
+                            <div class="progress">
+                                <div class="progress-bar bg-info" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">65%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card p-3">
+                            <h6>Recent Feedback</h6>
+                            <div class="feedback-item border-bottom py-2">
+                                <p class="mb-1"><strong>Technical Interview</strong></p>
+                                <p class="text-muted mb-1">Good problem-solving approach, need to improve explanation clarity.</p>
+                                <small class="text-muted">2 days ago</small>
+                            </div>
+                            <div class="feedback-item py-2">
+                                <p class="mb-1"><strong>HR Interview</strong></p>
+                                <p class="text-muted mb-1">Excellent communication skills, well-structured responses.</p>
+                                <small class="text-muted">5 days ago</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function startNewInterview() {
+            // Add interview initialization logic
+            alert('Starting new interview session...');
+        }
+
+        function startMockInterview() {
+            // Add mock interview initialization logic
+            alert('Initializing mock interview...');
+        }
+
+        // Add more interactive features
+        document.addEventListener('DOMContentLoaded', function() {
+            // Highlight active navigation item
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Add hover effects to quick action cards
+            const cards = document.querySelectorAll('.quick-action-card');
+            cards.forEach(card => {
+                card.style.cursor = 'pointer';
+                card.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 100);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
