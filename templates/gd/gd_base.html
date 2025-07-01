@@ -1,0 +1,145 @@
+{% extends 'gd_app/base.html' %}
+{% block content %}
+<h2>Discussion Room: {{ room.code }}</h2>
+<div id="video-grid" class="row"></div>
+{% if is_assessor %}
+<button id="end-session" class="btn btn-danger">End Session</button>
+{% endif %}
+<script>
+    const roomCode = "{{ room.code }}";
+    const user = "{{ user.username }}";
+    const isAssessor = {{ is_assessor|yesno:"true,false" }};
+    const socket = new WebSocket(`ws://${window.location.host}/ws/video/${roomCode}/`);
+    const videoGrid = document.getElementById('video-grid');
+    const peers = {};
+
+    // Get user media
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        .then(stream => {
+            const myVideo = document.createElement('video');
+            myVideo.muted = true;
+            myVideo.srcObject = stream;
+            myVideo.setAttribute('data-username', user);
+            myVideo.addEventListener('loadedmetadata', () => myVideo.play());
+            videoGrid.appendChild(myVideo);
+
+            socket.onmessage = async function(event) {
+                const data = JSON.parse(event.data);
+                if (data.type === 'user_joined' && data.username !== user && isAssessor) {
+                    const peer = createPeer(data.username, stream);
+                    peers[data.username] = peer;
+                } else if (data.type === 'offer' && data.from !== user) {
+                    const peer = addPeer(data.offer, data.from, stream);
+                    peers[data.from] = peer;
+                    const answer = await peer.createAnswer();
+                    await peer.setLocalDescription(answer);
+                    socket.send(JSON.stringify({
+                        type: 'answer',
+                        answer: answer,
+                        from: user,
+                        to: data.from,
+                        is_assessor: isAssessor
+                    }));
+                } else if (data.type === 'answer' && peers[data.from]) {
+                    await peers[data.from].setRemoteDescription(new RTCSessionDescription(data.answer));
+                } else if (data.type === 'ice-candidate' && peers[data.from]) {
+                    await peers[data.from].addIceCandidate(new RTCIceCandidate(data.candidate));
+                } else if (data.type === 'mute' && data.username === user) {
+                    stream.getAudioTracks().forEach(track => track.enabled = false);
+                    alert('You have been muted by the assessor.');
+                } else if (data.type === 'end') {
+                    alert(data.message);
+                    window.location.href = '/';
+                } else if (data.type === 'user_left') {
+                    if (peers[data.username]) {
+                        peers[data.username].close();
+                        delete peers[data.username];
+                        document.querySelector(`video[data-username="${data.username}"]`)?.remove();
+                    }
+                }
+            };
+
+            socket.onopen = () => {
+                if (isAssessor) {
+                    document.getElementById('end-session').onclick = () => {
+                        socket.send(JSON.stringify({
+                            type: 'end_session',
+                            is_assessor: true
+                        }));
+                    };
+                }
+            };
+        })
+        .catch(err => alert('Failed to access camera/microphone: ' + err));
+
+    function createPeer(username, stream) {
+        const peer = new RTCPeerConnection({
+            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+        });
+        stream.getTracks().forEach(track => peer.addTrack(track, stream));
+        peer.ontrack = event => addVideoStream(event.streams[0], username);
+        peer.onicecandidate = event => {
+            if (event.candidate) {
+                socket.send(JSON.stringify({
+                    type: 'ice-candidate',
+                    candidate: event.candidate,
+                    from: user,
+                    to: username,
+                    is_assessor: isAssessor
+                }));
+            }
+        };
+        peer.createOffer().then(offer => {
+            peer.setLocalDescription(offer);
+            socket.send(JSON.stringify({
+                type: 'offer',
+                offer: offer,
+                from: user,
+                is_assessor: isAssessor
+            }));
+        });
+        return peer;
+    }
+
+    function addPeer(offer, from, stream) {
+        const peer = new RTCPeerConnection({
+            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+        });
+        stream.getTracks().forEach(track => peer.addTrack(track, stream));
+        peer.ontrack = event => addVideoStream(event.streams[0], from);
+        peer.onicecandidate = event => {
+            if (event.candidate) {
+                socket.send(JSON.stringify({
+                    type: 'ice-candidate',
+                    candidate: event.candidate,
+                    from: user,
+                    to: from,
+                    is_assessor: isAssessor
+                }));
+            }
+        };
+        peer.setRemoteDescription(new RTCSessionDescription(offer));
+        return peer;
+    }
+
+    function addVideoStream(stream, username) {
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.setAttribute('data-username', username);
+        video.addEventListener('loadedmetadata', () => video.play());
+        videoGrid.appendChild(video);
+    }
+</script>
+<style>
+    #video-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 10px;
+    }
+    video {
+        width: 100%;
+        height: auto;
+        border: 1px solid #ccc;
+    }
+</style>
+{% endblock %}

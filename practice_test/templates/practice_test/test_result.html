@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Welcome {{ request.user }}</h1>
+    <h2>{{ test.title }}</h2>
+    <p>Your Score: {{ submission.score }} / {{ test.question_set.count }}</p>
+    
+    <div class="btn-group" role="group">
+        <!-- Retake Test button (already correct) -->
+        <a href="{% url 'practice_test:take_test' test.id %}" class="btn btn-primary">
+            Retake Test
+        </a>
+        
+        <!-- View Detailed Results button -->
+        <a href="{% url 'practice_test:test_result' test.id submission.id %}" class="btn btn-secondary">
+            View Detailed Results
+        </a>
+        
+        <!-- Return to Practice Home -->
+        <a href="{% url 'practice_test:practice_home' %}" class="btn btn-outline-primary">
+            Back to Practice Tests
+        </a>
+    </div>
+    
+    <!-- Additional result details can go here -->
+    <div class="mt-4">
+        <h4>Performance Summary</h4>
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" 
+                 style="width: {{ submission.score|percentage:test.question_set.count }}%">
+                {{ submission.score|percentage:test.question_set.count }}%
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Technical Assessments</h1>
+    <div class="row">
+        {% for topic in topics %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-{{ topic.icon }}"></i> {{ topic.name }}
+                    </h5>
+                    <p class="card-text">Test your {{ topic.name|lower }} skills</p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'technical_assessment:topic_problems' topic.id %}" 
+                       class="btn btn-primary">
+                        Start Assessment
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">No assessment topics available yet.</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

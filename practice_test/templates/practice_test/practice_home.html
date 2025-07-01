@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Practice Tests</h1>
+    <div class="row">
+        {% for test in tests %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ test.title }}</h5>
+                    <p class="card-text">{{ test.description }}</p>
+                    <p class="text-muted">
+                        <i class="fas fa-question-circle"></i> {{ test.question_set.count }} questions
+                        {% if test.id in completed_tests %}
+                        <span class="badge bg-success ms-2">Completed</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'practice_test:take_test' test.id %}" class="btn btn-primary">
+                        {% if test.id in completed_tests %}Retake Test{% else %}Start Test{% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">No tests available at the moment.</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

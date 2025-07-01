@@ -65,8 +65,9 @@
                 <nav class="nav flex-column">
                     <a class="nav-link active" href="{% url 'dashboard' %}"><i class="fas fa-home me-2"></i>Dashboard</a>
                     <a class="nav-link" href="#"><i class="fas fa-user-tie me-2"></i>Mock Interviews</a>
-                    <a class="nav-link" href="#"><i class="fas fa-users me-2"></i>Group Discussions</a>
-                    <a class="nav-link" href="#"><i class="fas fa-code me-2"></i>Technical Tests</a>
+                    <a class="nav-link" href="{% url 'group_discussion:gd_lobby' %}"><i class="fas fa-users me-2"></i>Group Discussions</a>
+                    <a class="nav-link" href="{% url 'technical_assessment:assessment_home' %}"> <i class="fas fa-code me-2"></i>Technical Tests</a>
+                    <a class="nav-link" href="{% url 'practice_test:practice_home' %}"><i class="fas fa-question-circle me-2"></i>Practice Tests</a>
                     <a class="nav-link" href="#"><i class="fas fa-book me-2"></i>Resources</a>
                     <a class="nav-link" href="#"><i class="fas fa-chart-line me-2"></i>Progress</a>
                     <a class="nav-link" href="{% url 'logout' %}"><i class="fa fa-sign-out-alt"></i> <!-- Logout icon -->
@@ -134,35 +135,43 @@
                     </div>
                 </div>
 
+                
                 <!-- Quick Actions -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <h4 class="mb-3">Quick Actions</h4>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card quick-action-card p-4 text-center cursor-pointer" onclick="startMockInterview()">
-                            <i class="fas fa-video fa-3x mb-3 text-primary"></i>
-                            <h5>Start Mock Interview</h5>
-                            <p class="text-muted">Practice with AI interviewer</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card quick-action-card p-4 text-center">
-                            <i class="fas fa-users fa-3x mb-3 text-success"></i>
-                            <h5>Join Group Discussion</h5>
-                            <p class="text-muted">Practice with peers</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card quick-action-card p-4 text-center">
-                            <i class="fas fa-laptop-code fa-3x mb-3 text-info"></i>
-                            <h5>Technical Assessment</h5>
-                            <p class="text-muted">Test your skills</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Upcoming Interviews -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="mb-3">Quick Actions</h4>
+    </div>
+    <div class="col-md-3">
+        <div class="card quick-action-card p-4 text-center cursor-pointer" onclick="startMockInterview()">
+            <i class="fas fa-video fa-3x mb-3 text-primary"></i>
+            <h5>Start Mock Interview</h5>
+            <p class="text-muted">Practice with AI interviewer</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card quick-action-card p-4 text-center" onclick="window.location.href='{% url 'group_discussion:gd_lobby' %}'">
+            <i class="fas fa-users fa-3x mb-3 text-success"></i>
+            <h5>Join Group Discussion</h5>
+            <p class="text-muted">Practice with peers</p>
+        </div>
+    </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card quick-action-card p-4 text-center cursor-pointer" 
+             onclick="startTechnicalAssessment()">  <!-- Updated function name -->
+            <i class="fas fa-laptop-code fa-3x mb-3 text-info"></i>
+            <h5>Technical Assessment</h5>
+            <p class="text-muted">Test your skills</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card quick-action-card p-4 text-center cursor-pointer" onclick="startPracticeTest()">
+            <i class="fas fa-question-circle fa-3x mb-3 text-warning"></i>
+            <h5>Practice Test</h5>
+            <p class="text-muted">Test your knowledge</p>
+        </div>
+    </div>
+</div>                <!-- Upcoming Interviews -->
                 <div class="row mb-4">
                     <div class="col-12">
                         <h4 class="mb-3">Upcoming Interviews</h4>
@@ -242,6 +251,16 @@
         function startMockInterview() {
             // Add mock interview initialization logic
             alert('Initializing mock interview...');
+        }
+
+        function startPracticeTest() {
+            // Redirect to practice test page
+            window.location.href = "{% url 'practice_test:practice_home' %}";
+        }
+
+        // Add this with your other JavaScript functions
+        function startTechnicalAssessment() {
+             window.location.href = "{% url 'technical_assessment:assessment_home' %}";
         }
 
         // Add more interactive features

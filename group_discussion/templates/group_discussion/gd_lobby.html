@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GD Lobby - InterviewBuddy</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .card { box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15); }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3 sidebar bg-primary text-white p-3" style="min-height: 100vh;">
+                <h4>InterviewBuddy</h4>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                    <a class="nav-link active" href="{% url 'group_discussion:gd_lobby' %}">Group Discussions</a>
+                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                </nav>
+            </div>
+            <div class="col-md-9 p-4">
+                <h2>Group Discussion Lobby</h2>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Join a Room</h4>
+                        {% for room in rooms %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5>{{ room.room_name }}</h5>
+                                    <p>Topic: {{ room.topic }}</p>
+                                    <p>Participants: {{ room.participants.count }}/{{ room.max_participants }}</p>
+                                    <a href="{% url 'group_discussion:gd_room' room_id=room.room_id %}" class="btn btn-primary">Join</a>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p>No active rooms available.</p>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-6">
+                        <h4>Create a Room</h4>
+                        <form method="POST" action="{% url 'group_discussion:create_room' %}">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <input type="text" name="room_name" class="form-control" placeholder="Room Name" required>
+                            </div>
+                            <div class="mb-3">
+                                <input type="number" name="max_participants" class="form-control" min="2" max="8" value="6" required>
+                            </div>
+                            <div class="mb-3">
+                                <select name="topic" class="form-control">
+                                    <option value="random">Random Topic</option>
+                                    {% for topic in "Impact of Technology on Jobs|Work-from-Home vs Office Work|Climate Change Solutions|AI in Everyday Life" %}
+                                        <option value="{{ topic }}">{{ topic }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-success">Create Room</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

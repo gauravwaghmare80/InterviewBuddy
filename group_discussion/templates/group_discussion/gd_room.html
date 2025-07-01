@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GD Room - {{ room.room_name }}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3 sidebar bg-primary text-white p-3" style="min-height: 100vh;">
+                <h4>InterviewBuddy</h4>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                    <a class="nav-link active" href="{% url 'group_discussion:gd_lobby' %}">Group Discussions</a>
+                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                </nav>
+            </div>
+            <div class="col-md-9 p-4">
+                <h2>{{ room.room_name }}</h2>
+                <p><strong>Topic:</strong> {{ room.topic }}</p>
+                <div id="jitsi-container" style="height: 500px;"></div>
+                <div class="mt-3">
+                    <p><strong>Time Left:</strong> <span id="timer">15:00</span></p>
+                    <h5>Participants:</h5>
+                    <ul>
+                        {% for participant in room.participants.all %}
+                            <li>{{ participant.username }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://meet.jit.si/external_api.js"></script>
+    <script>
+        const domain = '{{ jitsi_domain }}';
+        const options = {
+            roomName: '{{ room.room_id }}',
+            width: '100%',
+            height: '100%',
+            parentNode: document.querySelector('#jitsi-container'),
+            interfaceConfigOverwrite: { filmStripOnly: false }
+        };
+        const api = new JitsiMeetExternalJS(domain, options);
+
+        // Timer (15 minutes)
+        let timeLeft = 15 * 60;
+        const timer = setInterval(() => {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                window.location.href = "{% url 'group_discussion:gd_feedback' room_id=room.room_id %}";
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

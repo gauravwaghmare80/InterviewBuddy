@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ test.title }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {% for question in questions %}
+        <div class="mb-3">
+            <p>{{ question.text }}</p>
+            <div>
+                {{ forms|get_item:question.id }}
+                <p>1. {{ question.option1 }}</p>
+                <p>2. {{ question.option2 }}</p>
+                <p>3. {{ question.option3 }}</p>
+                <p>4. {{ question.option4 }}</p>
+            </div>
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}

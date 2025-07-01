@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GD Feedback - InterviewBuddy</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3 sidebar bg-primary text-white p-3" style="min-height: 100vh;">
+                <h4>InterviewBuddy</h4>
+                <nav class="nav flex-column">
+                    <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                    <a class="nav-link active" href="{% url 'group_discussion:gd_lobby' %}">Group Discussions</a>
+                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                </nav>
+            </div>
+            <div class="col-md-9 p-4">
+                <h2>Feedback for {{ room.room_name }}</h2>
+                <p><strong>Topic:</strong> {{ room.topic }}</p>
+                <div class="card p-3">
+                    <h5>Your Performance</h5>
+                    <p><strong>Content Quality:</strong> {{ feedback.content_quality }}/5</p>
+                    <p><strong>Communication Skills:</strong> {{ feedback.communication_skills }}/5</p>
+                    <p><strong>Participation:</strong> {{ feedback.participation }}/5</p>
+                    <p><strong>Leadership:</strong> {{ feedback.leadership }}/5</p>
+                    <p><strong>Overall Score:</strong> {{ feedback.overall_score|floatformat:1 }}/5</p>
+                    <p><strong>Feedback:</strong> {{ feedback.feedback_text }}</p>
+                </div>
+                <a href="{% url 'group_discussion:gd_lobby' %}" class="btn btn-primary mt-3">Back to Lobby</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Room: {{ room.code }}</h2>
+<h3>Participants</h3>
+<ul>
+{% for participant in participants %}
+    <li>{{ participant.user.username }}
+        {% if user == room.assessor and participant.user != user %}
+        <button class="btn btn-warning mute-user" data-username="{{ participant.user.username }}">Mute</button>
+        {% endif %}
+    </li>
+{% endfor %}
+</ul>
+<a href="{% url 'group_discussion:join_room' room.code %}" class="btn btn-primary">Join Discussion</a>
+<script>
+    const socket = new WebSocket(`ws://${window.location.host}/ws/video/{{ room.code }}/`);
+    document.querySelectorAll('.mute-user').forEach(button => {
+        button.onclick = function() {
+            const username = this.getAttribute('data-username');
+            socket.onopen = () => {
+                socket.send(JSON.stringify({
+                    type: 'mute',
+                    username: username,
+                    is_assessor: true
+                }));
+            };
+        };
+    });
+</script>
+{% endblock %}
